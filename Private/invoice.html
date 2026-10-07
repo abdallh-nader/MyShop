@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title data-i18n="invoice">Invoice</title>
+  <script src="/js/common.js"></script>
+  <style>
+    /* Invoice is always white/black so it prints well, whatever the site theme is */
+    body{margin:0;background:#eef1f3;color:#111;font:15px/1.5 "Segoe UI",Tahoma,system-ui,sans-serif}
+    .bar{display:flex;gap:.6rem;align-items:center;justify-content:space-between;padding:.7rem 1rem;background:#fff;border-bottom:1px solid #ddd}
+    .bar button{padding:.5rem 1rem;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font:inherit}
+    .bar .primary{background:#0e7490;color:#fff;border-color:#0e7490}
+    .bar button.active{font-weight:700}
+    .sheet{max-width:780px;margin:1.2rem auto;background:#fff;padding:2rem;border:1px solid #ddd}
+    h1{margin:0;font-size:1.6rem} .head{display:flex;justify-content:space-between;gap:1rem;border-bottom:2px solid #111;padding-bottom:.8rem;margin-bottom:1rem}
+    .meta div{margin:.15rem 0}
+    table{width:100%;border-collapse:collapse;margin:1rem 0}
+    th,td{padding:.55rem .6rem;border-bottom:1px solid #ddd;text-align:start}
+    th{background:#f3f5f6} td.n,th.n{text-align:end;white-space:nowrap}
+    .sum{margin-inline-start:auto;width:min(300px,100%)}
+    .sum div{display:flex;justify-content:space-between;padding:.2rem 0}
+    .sum .grand{font-weight:700;font-size:1.15rem;border-top:2px solid #111;margin-top:.3rem;padding-top:.4rem}
+    @media print{body{background:#fff}.bar{display:none}.sheet{border:0;margin:0;max-width:none;padding:0}}
+  </style>
+</head>
+<body>
+  <div class="bar">
+    <div><button data-lang="en">English</button> <button data-lang="ar">العربية</button></div>
+    <button class="primary" onclick="window.print()" data-i18n="print_pdf">Print / Save as PDF</button>
+  </div>
+  <div class="sheet" id="sheet"></div>
+  <script>
+    document.documentElement.dataset.theme = "light";     // force light theme for the invoice
+    let order = null;
+    const id = new URLSearchParams(location.search).get("id");
+
+    // Draw the invoice from the order data (called again when the language changes)
+    function render() {
+      if (!order) return;
+      const o = order, sub = o.items.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
+      const date = new Date(o.createdAt).toLocaleString(lang === "ar" ? "ar-JO-u-nu-latn" : "en-GB");
+      sheet.innerHTML = `
+        <div class="head">
+          <div><h1>${t("brand")}</h1><div>${t("invoice_no", { n: o.id })}</div></div>
+          <div class="meta">
+            <div>${t("date")}: ${date}</div>
+            ${o.customerName ? `<div>${t("full_name")}: <strong>${esc(o.customerName)}</strong></div>` : ""}
+            <div>${t("phone")}: <span dir="ltr">${esc(o.phone)}</span></div>
+            <div>${t("zone")}: ${t(o.deliveryZone === "Amman" ? "zone_amman" : "zone_outside")}</div>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>${t("item")}</th><th class="n">${t("qty")}</th><th class="n">${t("unit_price")}</th><th class="n">${t("total")}</th></tr></thead>
+          <tbody>${o.items.map(i => `<tr><td>${esc(i.productName)}${i.optionText ? `<div style="color:#555;font-size:.85em">${esc(i.optionText)}</div>` : ""}</td><td class="n">${i.quantity}</td>
+            <td class="n">${money(i.unitPrice)}</td><td class="n">${money(i.unitPrice * i.quantity)}</td></tr>`).join("")}</tbody>
+        </table>
+        <div class="sum">
+          <div><span>${t("subtotal")}</span><span>${money(sub)}</span></div>
+          <div><span>${t("delivery")}</span><span>${money(o.deliveryFee)}</span></div>
+          <div class="grand"><span>${t("total")}</span><span>${money(o.total)}</span></div>
+        </div>`;
+    }
+    window.onLangChange = render;
+    api("/api/admin/orders/" + encodeURIComponent(id)).then(r => {
+      if (r.status === 401) location.href = "/admin-login.html";
+      else if (r.ok) { order = r.data; render(); }
+    });
+  </script>
+</body>
+</html>

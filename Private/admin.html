@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title data-i18n="title_admin">Admin</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/common.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <span class="brand" data-i18n="title_admin">Admin</span>
+    <div class="lang-switch"><button data-lang="en">English</button>|<button data-lang="ar">العربية</button></div>
+    <button id="themeBtn" class="icon-btn" aria-label="Theme"></button>
+    <button id="logoutBtn" class="btn" data-i18n="logout">Log out</button>
+  </header>
+
+  <main class="container">
+    <div class="tabs">
+      <button class="btn active" id="tabProducts" data-i18n="tab_products">Products</button>
+      <button class="btn" id="tabOrders" data-i18n="tab_orders">Orders</button>
+      <span class="spacer"></span>
+      <button class="btn primary" id="addBtn" data-i18n="add_product">Add product</button>
+    </div>
+
+    <section id="productsView"><div class="table-wrap"><table>
+      <thead><tr><th></th><th data-i18n="name">Name</th><th data-i18n="price">Price</th><th data-i18n="stock">Stock</th><th data-i18n="actions">Actions</th></tr></thead>
+      <tbody id="productRows"></tbody>
+    </table></div></section>
+
+    <section id="ordersView" hidden><div id="orderList"></div></section>
+  </main>
+
+  <!-- Add / edit product form -->
+  <dialog id="dlg">
+    <input type="hidden" id="pid">
+    <label><span data-i18n="name">Name</span><input id="pname" type="text" maxlength="150"></label>
+    <label><span data-i18n="price">Price</span><input id="pprice" type="number" step="0.01" min="0.01"></label>
+    <label><span data-i18n="stock">Stock</span><input id="pstock" type="number" step="1" min="0"></label>
+    <label><span data-i18n="description">Description</span><textarea id="pdesc" rows="3" maxlength="1000"></textarea></label>
+    <label><span data-i18n="discount">Discount %</span><input id="pdisc" type="number" step="1" min="0" max="99" value="0"></label>
+    <div id="saleHint" class="msg ok" dir="ltr" style="margin-top:-.5rem"></div>
+    <div style="margin-bottom:.9rem">
+      <div style="font-weight:600;font-size:.95rem;margin-bottom:.3rem" data-i18n="image">Image</div>
+      <!-- Drop zone: drag an image here or click to choose one -->
+      <div id="drop" class="drop" tabindex="0" role="button">
+        <img id="prev" class="prev" alt="" hidden>
+        <div data-i18n="drop_hint">Drag &amp; drop an image here, or click to choose</div>
+        <input id="pimage" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+      </div>
+    </div>
+    <div class="msg" id="imgHint" style="color:var(--muted)" data-i18n="keep_image"></div>
+    <!-- Options the customer can choose (size, kilos, ...) -->
+    <div class="opt-box">
+      <div style="font-weight:600;font-size:.95rem" data-i18n="options">Options</div>
+      <div class="muted" data-i18n="opt_hint"></div>
+      <input id="optName" type="text" maxlength="50" data-i18n-ph="opt_group_ph" style="margin:.5rem 0">
+      <div id="optList"></div>
+      <button type="button" class="btn" id="addOptBtn" data-i18n="add_option">Add option</button>
+    </div>
+    <div id="formMsg" class="msg err"></div>
+    <div class="actions" style="justify-content:flex-end">
+      <button class="btn" id="cancelBtn" data-i18n="cancel">Cancel</button>
+      <button class="btn primary" id="saveBtn" data-i18n="save">Save</button>
+    </div>
+  </dialog>
+
+  <script src="/admin/admin.js"></script>
+</body>
+</html>

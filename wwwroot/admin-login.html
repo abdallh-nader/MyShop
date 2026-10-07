@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title data-i18n="title_login">Admin login</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/common.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <span class="brand" data-i18n="title_login">Admin login</span>
+    <div class="lang-switch"><button data-lang="en">English</button>|<button data-lang="ar">العربية</button></div>
+    <button id="themeBtn" class="icon-btn" aria-label="Theme"></button>
+  </header>
+  <main class="login-box">
+    <label><span data-i18n="username">Username</span><input id="user" type="text" autocomplete="username"></label>
+    <label><span data-i18n="password">Password</span><input id="pass" type="password" autocomplete="current-password"></label>
+    <div id="msg" class="msg err"></div>
+    <button id="loginBtn" class="btn primary block" data-i18n="login">Log in</button>
+  </main>
+  <script>
+    // Send credentials to the API; on success the server sets the login cookie and we open /admin
+    async function login() {
+      const r = await api("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: user.value, password: pass.value }) });
+      if (r.ok) location.href = "/admin"; else msg.textContent = t("login_fail");
+    }
+    loginBtn.onclick = login;
+    pass.addEventListener("keydown", e => { if (e.key === "Enter") login(); });
+  </script>
+</body>
+</html>

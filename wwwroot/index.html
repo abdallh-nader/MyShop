@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title data-i18n="title_shop">Shop</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/common.js"></script>
+</head>
+<body>
+  <!-- Top bar: brand, language switch, theme button, cart button -->
+  <header class="topbar">
+    <span class="brand" data-i18n="brand">My Shop</span>
+    <div class="lang-switch"><button data-lang="en">English</button>|<button data-lang="ar">العربية</button></div>
+    <button id="themeBtn" class="icon-btn" aria-label="Theme"></button>
+    <button id="cartBtn" class="icon-btn" aria-label="Cart">🛒<span id="cartCount" class="badge" hidden>0</span></button>
+  </header>
+
+  <main class="container">
+    <h1 data-i18n="products">Products</h1>
+    <div id="grid" class="grid"></div>
+  </main>
+
+  <!-- Cart drawer with 3 views: cart -> delivery details -> done -->
+  <div id="overlay" class="overlay"></div>
+  <aside id="drawer" class="drawer" aria-label="Cart">
+    <div class="drawer-head"><span id="drawerTitle" data-i18n="cart">Cart</span><button id="closeBtn" class="icon-btn" aria-label="Close">✕</button></div>
+
+    <section id="viewCart" style="display:contents">
+      <div class="drawer-body" id="cartList"></div>
+      <div class="drawer-foot">
+        <div class="total"><span data-i18n="total">Total</span><span id="cartTotal"></span></div>
+        <button id="confirmBtn" class="btn primary block" data-i18n="confirm">Confirm order</button>
+      </div>
+    </section>
+
+    <section id="viewCheckout" style="display:none;flex:1;flex-direction:column;min-height:0">
+      <div class="drawer-body">
+        <label><span data-i18n="full_name">Full name</span>
+          <input id="custName" type="text" maxlength="100" autocomplete="name">
+        </label>
+        <label><span data-i18n="phone">Phone number</span>
+          <input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+962 7X XXX XXXX" dir="ltr">
+        </label>
+        <label><span data-i18n="zone">Delivery area</span>
+          <select id="zone"><option value="Amman" data-i18n="zone_amman">Inside Amman</option><option value="Outside" data-i18n="zone_outside">Outside Amman</option></select>
+        </label>
+        <div><strong data-i18n="location">Delivery location</strong></div>
+        <button id="locBtn" class="btn block" style="margin-top:.5rem" data-i18n="get_loc">Use my current location</button>
+        <div id="locInfo" class="msg" dir="ltr"></div>
+        <iframe id="mapPreview" class="map" title="map" hidden></iframe>
+        <div id="orderMsg" class="msg err"></div>
+      </div>
+      <div class="drawer-foot">
+        <div class="sumrow"><span data-i18n="subtotal">Subtotal</span><span id="subTotal"></span></div>
+        <div class="sumrow"><span data-i18n="delivery">Delivery</span><span id="feeText"></span></div>
+        <div class="total"><span data-i18n="total">Total</span><span id="checkoutTotal"></span></div>
+        <button id="placeBtn" class="btn primary block" data-i18n="place">Place order</button>
+        <button id="backBtn" class="btn block" data-i18n="back">Back</button>
+      </div>
+    </section>
+
+    <section id="viewDone" style="display:none;flex:1;flex-direction:column">
+      <div class="drawer-body done">
+        <div class="big">✓</div>
+        <p data-i18n="done">Order placed!</p>
+        <p><span data-i18n="order_no">Order number</span>: <strong id="orderId"></strong></p>
+      </div>
+      <div class="drawer-foot"><button id="doneBtn" class="btn primary block" data-i18n="continue">Continue shopping</button></div>
+    </section>
+  </aside>
+
+  <script src="/js/shop.js"></script>
+</body>
+</html>
