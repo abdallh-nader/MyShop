@@ -1,22 +1,21 @@
-# 1. Base image for running the app
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
-WORKDIR /app
-EXPOSE 8080
-
-# 2. Build image
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
+
+# نسخ ملف المشروع واسترجاع الحزم
 COPY ["ShopApp.csproj", "./"]
 RUN dotnet restore "ShopApp.csproj"
-COPY . .
-RUN dotnet build "ShopApp.csproj" -c Release -o /app/build
 
-# 3. Publish image
-FROM build AS publish
+# نسخ باقي الملفات وبناء التطبيق
+COPY . .
 RUN dotnet publish "ShopApp.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-# 4. Final runtime image
-FROM base AS final
+# مرحلة التشغيل النهائي
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build /app/publish .
+
+# ضبط المنفذ والبيئة
+ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 8080
+
 ENTRYPOINT ["dotnet", "ShopApp.dll"]

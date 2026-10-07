@@ -8,12 +8,21 @@ var builder = WebApplication.CreateBuilder(args);
 // --- Render Port Configuration ---
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 builder.WebHost.UseUrls($"http://*:{port}");
+
 // --- Database: MySQL / MariaDB through EF Core ---
-var cs = builder.Configuration.GetConnectionString("Default")!;
-// Detect the real server (XAMPP uses MariaDB, others use MySQL) so EF generates SQL that the server understands.
-// The database name is removed for detection because the database may not exist yet on first run.
-var serverVersion = ServerVersion.AutoDetect(new MySqlConnector.MySqlConnectionStringBuilder(cs) { Database = "" }.ConnectionString);
-builder.Services.AddDbContext<AppDbContext>(o => o.UseMySql(cs, serverVersion));
+var cs = builder.Configuration.GetConnectionString("Default") 
+         ?? throw new InvalidOperationException("Connection string 'Default' not found in configuration.");
+
+// Fix: Use explicit MySQL version to prevent crashes on startup from AutoDetect
+var serverVersion = new MySqlServerVersion(new Version(8, 0, 30));
+
+builder.Services.AddDbContext<AppDbContext>(o => o.UseMySql(cs, serverVersion, mysqlOptions =>
+{
+    mysqlOptions.EnableRetryOnFailure(
+        maxRetryCount: 5,
+        maxRetryDelay: TimeSpan.FromSeconds(10),
+        errorNumbersToAdd: null);
+}));
 
 // --- Admin login: secure cookie (HttpOnly, SameSite=Strict so other sites cannot send it) ---
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(o =>
@@ -38,7 +47,11 @@ var app = builder.Build();
 
 // Create the database and tables on first run (see README for migrations).
 using (var scope = app.Services.CreateScope())
-    scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.EnsureCreated();
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.EnsureCreated();
+}
+
 Directory.CreateDirectory(Path.Combine(app.Environment.WebRootPath, "uploads"));
 
 app.UseDefaultFiles();      // "/" -> index.html (customer page)
