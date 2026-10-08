@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.EntityFrameworkCore;
 using ShopApp.Data;
 using ShopApp.Services;
@@ -63,7 +64,13 @@ app.UseAuthentication();    // reads the login cookie
 app.UseAuthorization();     // enforces [Authorize]
 app.MapControllers();
 app.UseStaticFiles();
-
+// --- إضافة المجلد الخارجي image للخدمة كـ Static Files ---
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(app.Environment.ContentRootPath, "images")),
+    RequestPath = "/images"
+});
 // Admin page: only sent to a logged-in admin, everyone else is redirected to the login form.
 app.MapGet("/admin", (HttpContext c, IWebHostEnvironment env) =>
 {
