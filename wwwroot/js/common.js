@@ -4,7 +4,7 @@ const CURRENCY = "JOD"; // change to your currency code (USD, EUR, ...)
 // All visible texts. Add a key in both languages to add a new text.
 const I18N = {
   en: {
-    brand: "My Shop", title_shop: "Shop", title_admin: "Admin", title_login: "Admin login",
+    brand: "DUKKAN", title_shop: "DUKKAN", title_admin: "Admin DUKKAN", title_login: "Admin DUKKAN login",
     products: "Products", add: "Add to cart", out: "Out of stock", left: "Only {n} left", no_products: "No products yet.",
     cart: "Cart", empty: "Your cart is empty.", total: "Total", confirm: "Confirm order", remove: "Remove",
     checkout: "Delivery details", phone: "Phone number", location: "Delivery location", get_loc: "Use my current location",
@@ -27,7 +27,7 @@ const I18N = {
     err_save: "Could not save. Check the values."
   },
   ar: {
-    brand: "متجري", title_shop: "المتجر", title_admin: "لوحة الإدارة", title_login: "تسجيل دخول المسؤول",
+    brand: "دُكّان", title_shop: "دُكّان", title_admin: "لوحة الإدارة", title_login: "تسجيل دخول مسؤول دُكّان ",
     products: "المنتجات", add: "أضف إلى السلة", out: "نفدت الكمية", left: "متبقي {n} فقط", no_products: "لا توجد منتجات بعد.",
     cart: "السلة", empty: "سلتك فارغة.", total: "المجموع", confirm: "تأكيد الطلب", remove: "حذف",
     checkout: "بيانات التوصيل", phone: "رقم الهاتف", location: "موقع التوصيل", get_loc: "استخدم موقعي الحالي",
