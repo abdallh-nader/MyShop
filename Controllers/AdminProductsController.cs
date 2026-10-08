@@ -5,15 +5,16 @@ using Microsoft.EntityFrameworkCore;
 using ShopApp.Data;
 using ShopApp.Models;
 using ShopApp.Services;
+
 namespace ShopApp.Controllers;
 
-// ADMIN ONLY: [Authorize] makes every action return 401 without the admin cookie.
+// Admin only: [Authorize] requires valid admin session cookie
 [ApiController, Authorize, Route("api/admin/products")]
-public class AdminProductsController(AppDbContext db, ImageStorage images) : ControllerBase
+public class AdminProductsController(AppDbContext db, IPhotoService photoService) : ControllerBase
 {
     private record OptionInput(int Id, string Label, decimal Price);
 
-    // Reads the options sent by the admin form (JSON text) and validates them. Returns null if invalid.
+    // Parses JSON options sent by admin form. Returns null if invalid.
     private static List<OptionInput>? ParseOptions(ProductForm f)
     {
         if (string.IsNullOrWhiteSpace(f.OptionsJson)) return new();
@@ -23,7 +24,7 @@ public class AdminProductsController(AppDbContext db, ImageStorage images) : Con
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
             if (list.Count > 20 || list.Any(o => string.IsNullOrWhiteSpace(o.Label) || o.Label.Trim().Length > 60 ||
                                                  o.Price <= 0 || o.Price > 1000000)) return null;
-            if (list.Count > 0 && string.IsNullOrWhiteSpace(f.OptionsName)) return null; // group name is required
+            if (list.Count > 0 && string.IsNullOrWhiteSpace(f.OptionsName)) return null; // Group name required
             return list;
         }
         catch (JsonException) { return null; }
@@ -47,16 +48,24 @@ public class AdminProductsController(AppDbContext db, ImageStorage images) : Con
     {
         var opts = ParseOptions(f);
         if (opts == null) return BadRequest(new { error = "invalid_options" });
+
         var p = new Product
         {
             Name = f.Name.Trim(), Stock = f.Stock, DiscountPercent = f.DiscountPercent,
             Description = string.IsNullOrWhiteSpace(f.Description) ? null : f.Description.Trim(),
-            Price = opts.Count > 0 ? opts.Min(o => o.Price) : f.Price,   // with options, the product price = lowest option price
+            Price = opts.Count > 0 ? opts.Min(o => o.Price) : f.Price,
             OptionsName = opts.Count > 0 ? f.OptionsName!.Trim() : null,
             Options = opts.Select(o => new ProductOption { Label = o.Label.Trim(), Price = o.Price }).ToList()
         };
-        try { p.ImageUrl = await images.SaveAsync(f.Image); }          // upload image (if any)
-        catch (InvalidOperationException) { return BadRequest(new { error = "invalid_image" }); }
+
+        // Upload image to Cloudinary if provided
+        if (f.Image != null && f.Image.Length > 0)
+        {
+            var uploadResult = await photoService.AddPhotoAsync(f.Image);
+            if (uploadResult.Error != null) return BadRequest(new { error = "invalid_image" });
+            p.ImageUrl = uploadResult.SecureUrl.AbsoluteUri;
+        }
+
         db.Products.Add(p);
         await db.SaveChangesAsync();
         return Ok(p);
@@ -67,16 +76,20 @@ public class AdminProductsController(AppDbContext db, ImageStorage images) : Con
     {
         var p = await db.Products.Include(x => x.Options).FirstOrDefaultAsync(x => x.Id == id);
         if (p == null) return NotFound();
+
         var opts = ParseOptions(f);
         if (opts == null) return BadRequest(new { error = "invalid_options" });
-        try
-        {
-            var newImage = await images.SaveAsync(f.Image);
-            if (newImage != null) { images.Delete(p.ImageUrl); p.ImageUrl = newImage; } // replace old image
-        }
-        catch (InvalidOperationException) { return BadRequest(new { error = "invalid_image" }); }
 
-        // Options: remove the ones the admin deleted, update the existing ones, add the new ones
+        // If a new image is provided, upload to Cloudinary and update URL
+        if (f.Image != null && f.Image.Length > 0)
+        {
+            var uploadResult = await photoService.AddPhotoAsync(f.Image);
+            if (uploadResult.Error != null) return BadRequest(new { error = "invalid_image" });
+            
+            p.ImageUrl = uploadResult.SecureUrl.AbsoluteUri;
+        }
+
+        // Manage product options
         foreach (var old in p.Options.Where(o => !opts.Any(i => i.Id == o.Id)).ToList()) p.Options.Remove(old);
         foreach (var i in opts)
         {
@@ -84,10 +97,12 @@ public class AdminProductsController(AppDbContext db, ImageStorage images) : Con
             if (existing != null) { existing.Label = i.Label.Trim(); existing.Price = i.Price; }
             else p.Options.Add(new ProductOption { Label = i.Label.Trim(), Price = i.Price });
         }
+
         p.OptionsName = opts.Count > 0 ? f.OptionsName!.Trim() : null;
         p.Name = f.Name.Trim(); p.Stock = f.Stock; p.DiscountPercent = f.DiscountPercent;
         p.Description = string.IsNullOrWhiteSpace(f.Description) ? null : f.Description.Trim();
         p.Price = opts.Count > 0 ? opts.Min(o => o.Price) : f.Price;
+
         await db.SaveChangesAsync();
         return Ok(p);
     }
@@ -97,9 +112,9 @@ public class AdminProductsController(AppDbContext db, ImageStorage images) : Con
     {
         var p = await db.Products.FindAsync(id);
         if (p == null) return NotFound();
-        db.Products.Remove(p);                                         // options are deleted with it; old orders keep their copied text
+
+        db.Products.Remove(p);
         await db.SaveChangesAsync();
-        images.Delete(p.ImageUrl);
         return NoContent();
     }
 }

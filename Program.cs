@@ -28,7 +28,7 @@ builder.Services.AddDbContext<AppDbContext>(o => o.UseMySql(cs, serverVersion, m
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(o =>
 {
     o.Cookie.Name = "admin_auth";
-    o.Cookie.HttpOnly = true;                          // JavaScript cannot read the cookie
+    o.Cookie.HttpOnly = true;                           // JavaScript cannot read the cookie
     o.Cookie.SameSite = SameSiteMode.Strict;           // blocks cross-site (CSRF) requests
     o.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // use HTTPS in production
     o.ExpireTimeSpan = TimeSpan.FromHours(8);
@@ -39,7 +39,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();
-builder.Services.AddSingleton<ImageStorage>();
+
+// --- تسجيل خدمة رفع الصور السحابية (Cloudinary) ---
+builder.Services.AddScoped<IPhotoService, PhotoService>();
+
 builder.Services.Configure<FormOptions>(o => o.MultipartBodyLengthLimit = 22 * 1024 * 1024); // upload size cap (20 MB image + form fields)
 builder.WebHost.ConfigureKestrel(k => k.Limits.MaxRequestBodySize = 22 * 1024 * 1024);
 
