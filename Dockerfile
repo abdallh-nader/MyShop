@@ -9,6 +9,9 @@ RUN dotnet restore "ShopApp.csproj"
 COPY . .
 RUN dotnet publish "ShopApp.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
+# نسخ مجلد images الخارجي إلى مجلد النشر النهائي
+RUN cp -r images /app/publish/images || true
+
 # مرحلة التشغيل النهائي
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
