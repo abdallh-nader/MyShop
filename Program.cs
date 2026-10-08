@@ -62,6 +62,7 @@ app.UseStaticFiles();       // serves wwwroot (customer page, css, js, uploads)
 app.UseAuthentication();    // reads the login cookie
 app.UseAuthorization();     // enforces [Authorize]
 app.MapControllers();
+app.UseStaticFiles();
 
 // Admin page: only sent to a logged-in admin, everyone else is redirected to the login form.
 app.MapGet("/admin", (HttpContext c, IWebHostEnvironment env) =>
