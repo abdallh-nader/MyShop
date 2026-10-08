@@ -4,7 +4,7 @@ const CURRENCY = "JOD"; // change to your currency code (USD, EUR, ...)
 // All visible texts. Add a key in both languages to add a new text.
 const I18N = {
   en: {
-    brand: "DUKKAN", title_shop: "DUKKAN", title_admin: "Admin DUKKAN", title_login: "Admin DUKKAN login",
+    brand: "DUKKAN", title_shop: "DUKKAN", title_admin: "Admin DUKKAN", title_login: "Admin DUKKAN Login",
     products: "Products", add: "Add to cart", out: "Out of stock", left: "Only {n} left", no_products: "No products yet.",
     cart: "Cart", empty: "Your cart is empty.", total: "Total", confirm: "Confirm order", remove: "Remove",
     checkout: "Delivery details", phone: "Phone number", location: "Delivery location", get_loc: "Use my current location",
