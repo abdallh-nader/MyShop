@@ -730,3 +730,17 @@ select option { background: var(--surface); color: var(--text); }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+/* التحكم بحجم اللوجو */
+.logo-img {
+  height: 40px;        /* يمكنك تغيير الارتفاع حسب الرغبة (مثلاً 35px أو 45px) */
+  width: auto;         /* للحفاظ على أبعاد الصورة دون تشويه */
+  object-fit: contain;
+}
+
+/* محاذاة اللوجو مع النص والعناصر في الشريط العلوي */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
