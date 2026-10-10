@@ -178,3 +178,5 @@ window.onLangChange = () => { renderProducts(); renderCart(); };  // redraw text
 
 api("/api/settings").then(r => { if (r.ok) { fees = r.data; updateCheckoutTotals(); } });
 loadProducts();
+
+

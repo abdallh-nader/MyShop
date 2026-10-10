@@ -744,3 +744,30 @@ select option { background: var(--surface); color: var(--text); }
   align-items: center;
   gap: 0.5rem;
 }
+.site-footer {
+  background-color: var(--card-bg, #fff);
+  border-top: 1px solid var(--border-color, #eee);
+  padding: 1.5rem 1rem;
+  text-align: center;
+  margin-top: 3rem;
+  color: var(--text-color, #333);
+  font-size: 0.9rem;
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer-links a {
+  color: var(--primary-color, #007bff);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
