@@ -46,7 +46,7 @@ builder.Services.AddScoped<IPhotoService, PhotoService>();
 
 builder.Services.Configure<FormOptions>(o => o.MultipartBodyLengthLimit = 22 * 1024 * 1024); // upload size cap (20 MB image + form fields)
 builder.WebHost.ConfigureKestrel(k => k.Limits.MaxRequestBodySize = 22 * 1024 * 1024);
-
+builder.Services.AddHttpClient<TelegramNotifier>(c => c.Timeout = TimeSpan.FromSeconds(10));
 var app = builder.Build();
 
 // Create the database and tables on first run (see README for migrations).

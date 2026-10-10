@@ -9,7 +9,7 @@ namespace ShopApp.Controllers;
 
 // PUBLIC: a customer confirms an order. The server re-checks everything.
 [ApiController, Route("api/orders")]
-public class OrdersController(AppDbContext db, IConfiguration cfg) : ControllerBase
+public class OrdersController(AppDbContext db, IConfiguration cfg, TelegramNotifier tg) : ControllerBase
 {
     private static readonly Regex PhoneRx = new(@"^\+?[0-9]{7,15}$");
 
@@ -95,7 +95,7 @@ public class OrdersController(AppDbContext db, IConfiguration cfg) : ControllerB
             db.Orders.Add(order);
             await db.SaveChangesAsync();
             await tx.CommitAsync();
-
+            await tg.SendNewOrderAsync(order);
             return StatusCode(201, new { order.Id, order.Total });
         });
     }

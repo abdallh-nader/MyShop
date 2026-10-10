@@ -1,8 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>0bf44bc0-8d33-4edb-b587-c43b25cce7af</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <!-- MySQL provider for EF Core (brings EF Core itself) -->
