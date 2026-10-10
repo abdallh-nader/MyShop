@@ -25,7 +25,7 @@ const I18N = {
     actions: "Actions", no_orders: "No orders yet.", customer: "Customer", date: "Date", items: "Items", view_map: "View on map",
     order_n: "Order #{n}", err_image: "Image must be JPG, PNG, WEBP or GIF, up to 20 MB.", keep_image: "Leave empty to keep the current image.",
     err_save: "Could not save. Check the values.",rights: "© 2026 DUKKAN. All rights reserved.",
-contact_us: "Contact Us"
+  contact_us: "Contact Us",social_links: "Social Links",footer_desc: "Your first store for fast and safe shopping in Jordan."
   },
   ar: {
     brand: "دُكّان", title_shop: "دُكّان", title_admin: "لوحة الإدارة", title_login: "تسجيل دخول مسؤول دُكّان ",
@@ -49,7 +49,7 @@ contact_us: "Contact Us"
     actions: "الإجراءات", no_orders: "لا توجد طلبات بعد.", customer: "العميل", date: "التاريخ", items: "المنتجات", view_map: "عرض على الخريطة",
     order_n: "طلب رقم {n}", err_image: "يجب أن تكون الصورة JPG أو PNG أو WEBP أو GIF وبحجم أقصاه 20 ميجابايت.", keep_image: "اتركه فارغاً للإبقاء على الصورة الحالية.",
     err_save: "تعذّر الحفظ. تحقق من القيم.",rights: "© 2026 دُكّان. جميع الحقوق محفوظة.",
-contact_us: "تواصل معنا"
+  contact_us: "تواصل معنا", social_links: "روابط اجتماعية",footer_desc: "متجرك الأول للتسوق السريع والآمن في الأردن."
   }
 };
 
